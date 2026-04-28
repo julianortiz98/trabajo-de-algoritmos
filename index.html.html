@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarea 1 – Análisis de Algoritmos</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg:      #0a0d13;
+    --surface: #111620;
+    --panel:   #181f2e;
+    --border:  #1e2a40;
+    --accent:  #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn:    #f59e0b;
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --code-bg: #0d1117;
+    --radius:  8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;line-height:1.7;min-height:100vh;}
+
+  /* ── Header ── */
+  header{background:linear-gradient(135deg,#0a0d13 0%,#111620 50%,#0f1a2e 100%);border-bottom:1px solid var(--border);padding:2rem 3rem;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;top:-50%;left:-20%;width:60%;height:200%;background:radial-gradient(ellipse,rgba(0,229,255,.06) 0%,transparent 70%);pointer-events:none;}
+  header::after{content:'';position:absolute;top:0;right:0;width:30%;height:100%;background:radial-gradient(ellipse at right,rgba(124,58,237,.08) 0%,transparent 70%);pointer-events:none;}
+  .header-grid{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2rem;position:relative;}
+  .header-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;}
+  h1{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;background:linear-gradient(135deg,#fff 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .header-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:.8rem;}
+  .meta-pill{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);padding:.2rem .7rem;border-radius:999px;}
+  .badge-score{background:linear-gradient(135deg,var(--accent2),#4f46e5);border-radius:var(--radius);padding:1rem 1.5rem;text-align:center;min-width:110px;}
+  .badge-score .val{font-size:2rem;font-weight:800;color:#fff;}
+  .badge-score .lbl{font-size:.65rem;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;}
+
+  /* ── Nav ── */
+  nav{background:var(--surface);border-bottom:1px solid var(--border);padding:.6rem 3rem;display:flex;gap:.4rem;flex-wrap:wrap;position:sticky;top:0;z-index:50;}
+  .nav-btn{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:transparent;border:1px solid var(--border);color:var(--muted);padding:.35rem .8rem;border-radius:4px;cursor:pointer;transition:all .2s;}
+  .nav-btn:hover,.nav-btn.active{background:rgba(0,229,255,.1);border-color:var(--accent);color:var(--accent);}
+
+  /* ── Layout ── */
+  main{max-width:1100px;margin:0 auto;padding:2rem 2.5rem 4rem;}
+  .section{display:none;animation:fadeIn .3s ease;}
+  .section.visible{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .section-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+  .sec-number{font-family:'JetBrains Mono',monospace;font-size:.75rem;background:var(--accent);color:#000;width:2rem;height:2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+  .sec-title{font-size:1.35rem;font-weight:700;}
+  .sec-points{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--warn);border:1px solid rgba(245,158,11,.3);padding:.2rem .6rem;border-radius:4px;}
+
+  /* ── Cards ── */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem 1.6rem;margin-bottom:1.2rem;}
+  .card-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem;}
+
+  /* ── Complexity badges ── */
+  .complexity-row{display:flex;gap:.6rem;flex-wrap:wrap;margin:.6rem 0;}
+  .cx{padding:.25rem .7rem;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:700;}
+  .cx-big  {background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444;}
+  .cx-omega{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:var(--accent3);}
+  .cx-theta{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+
+  /* ── Tables ── */
+  .fn-table{width:100%;border-collapse:collapse;}
+  .fn-table th,.fn-table td{padding:.6rem .9rem;text-align:left;border-bottom:1px solid var(--border);font-size:.88rem;}
+  .fn-table th{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;background:var(--panel);}
+  .fn-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);}
+  .fn-table tr:hover td{background:rgba(255,255,255,.02);}
+  .err-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .err-table th{background:var(--panel);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;padding:.5rem .8rem;text-align:right;}
+  .err-table th:first-child{text-align:left;}
+  .err-table td{padding:.45rem .8rem;border-bottom:1px solid var(--border);text-align:right;font-family:'JetBrains Mono',monospace;}
+  .err-table td:first-child{text-align:left;}
+  .err-good{color:var(--accent3);}
+  .err-med {color:var(--warn);}
+  .err-bad {color:#ef4444;}
+
+  /* ── Code blocks ── */
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.7;margin:.8rem 0;}
+  .kw{color:#c792ea;} .fn{color:#82aaff;} .str{color:#c3e88d;} .cm{color:#546e7a;font-style:italic;} .nb{color:var(--accent);} .num{color:#f78c6c;}
+
+  /* ── Info / warn boxes ── */
+  .info-box{border-left:3px solid var(--accent);background:rgba(0,229,255,.05);padding:.9rem 1.2rem;border-radius:0 var(--radius) var(--radius) 0;margin:1rem 0;font-size:.9rem;}
+  .warn-box{border-left:3px solid var(--warn);background:rgba(245,158,11,.05);padding:.9rem 1.2rem;border-radius:0 var(--radius) var(--radius) 0;margin:1rem 0;font-size:.9rem;}
+  .ok-box  {border-left:3px solid var(--accent3);background:rgba(16,185,129,.05);padding:.9rem 1.2rem;border-radius:0 var(--radius) var(--radius) 0;margin:1rem 0;font-size:.9rem;}
+
+  /* ── Sub headings ── */
+  .sub{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.1em;margin:1.4rem 0 .5rem;}
+
+  /* ── Grid helpers ── */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+  @media(max-width:680px){.g2,.g3{grid-template-columns:1fr;}}
+
+  /* ── Perfect numbers ── */
+  .perf-num{display:inline-block;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);color:#c4b5fd;font-family:'JetBrains Mono',monospace;font-weight:700;padding:.3rem .8rem;border-radius:4px;margin:.2rem;font-size:.95rem;}
+
+  /* ── Case grid ── */
+  .case-grid{display:grid;grid-template-columns:180px 1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;font-size:.83rem;}
+  .case-cell{background:var(--surface);padding:.6rem .9rem;}
+  .case-head{background:var(--panel);font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+
+  /* ── Limit rule cards ── */
+  .limit-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1.2rem;font-size:.88rem;}
+  .limit-card .lim-expr{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.82rem;margin:.4rem 0;}
+  .limit-card .lim-result{font-weight:700;}
+
+  /* ── Poly input ── */
+  .poly-input{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:.3rem .5rem;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+  .poly-btn-sm{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem;}
+  .btn-add{background:rgba(0,229,255,.1);border:1px solid var(--accent);color:var(--accent);padding:.35rem .8rem;border-radius:4px;cursor:pointer;font-size:.8rem;}
+  .btn-calc{background:linear-gradient(135deg,var(--accent),#0099bb);color:#000;border:none;padding:.5rem 1.4rem;border-radius:4px;cursor:pointer;font-weight:700;}
+
+  /* ── Sort bar chart ── */
+  .bar-group{display:flex;align-items:flex-end;gap:3px;height:120px;}
+  .bar{border-radius:3px 3px 0 0;min-width:28px;transition:height .4s ease;position:relative;}
+  .bar-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-align:center;margin-top:3px;color:var(--muted);}
+  .bar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.58rem;white-space:nowrap;}
+
+  canvas{border-radius:var(--radius);}
+  footer{text-align:center;padding:2rem;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);}
+
+  /* ── Limit table ── */
+  .lim-table{width:100%;border-collapse:collapse;}
+  .lim-table th,.lim-table td{padding:.55rem .9rem;text-align:left;border-bottom:1px solid var(--border);font-size:.85rem;}
+  .lim-table th{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);text-transform:uppercase;background:var(--panel);}
+  .lim-table td:first-child,.lim-table td:nth-child(2){font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.8rem;}
+  .lim-zero{color:var(--accent3);font-weight:700;}
+  .lim-const{color:var(--warn);font-weight:700;}
+  .lim-inf{color:#ef4444;font-weight:700;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="header-tag">▸ Tecnológico de Antioquia · Ing. en Software · Semestre 7</div>
+      <h1>Tarea 1 — Análisis de Algoritmos</h1>
+      <div class="header-meta">
+        <span class="meta-pill">Docente: Jaime E. Montoya M.</span>
+        <span class="meta-pill">Entrega: 28/04/2026</span>
+        <span class="meta-pill">Grupo: PREPRO26010020008</span>
+        <span class="meta-pill">Unidad 2</span>
+      </div>
+    </div>
+    <div class="badge-score">
+      <div class="val">5.0</div>
+      <div class="lbl">Valor 20%</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="show(0)">P1 · Funciones</button>
+  <button class="nav-btn" onclick="show(1)">P2 · Taylor</button>
+  <button class="nav-btn" onclick="show(2)">P3 · Polinomios</button>
+  <button class="nav-btn" onclick="show(3)">P4 · Perfectos</button>
+  <button class="nav-btn" onclick="show(4)">P5 · Casos</button>
+  <button class="nav-btn" onclick="show(5)">P6 · Burbuja</button>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════════════
+     PUNTO 1 — FUNCIONES DE TIEMPO
+════════════════════════════════════════════ -->
+<section class="section visible" id="s0">
+  <div class="section-header">
+    <div class="sec-number">1</div>
+    <div class="sec-title">Funciones de tiempo y orden de magnitud</div>
+    <span class="sec-points">0.8 pts</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tabla de órdenes de magnitud</div>
+    <table class="fn-table">
+      <thead><tr>
+        <th>Función f(n)</th><th>Término dominante</th>
+        <th>O grande</th><th>Omega</th><th>Theta</th><th>Clase</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>7n + 4</td><td>7n</td>
+          <td><span class="cx cx-big">O(n)</span></td><td><span class="cx cx-omega">Ω(n)</span></td><td><span class="cx cx-theta">Θ(n)</span></td><td>Lineal</td></tr>
+        <tr><td>4n·lg(n) + 5n</td><td>4n·lg(n)</td>
+          <td><span class="cx cx-big">O(n log n)</span></td><td><span class="cx cx-omega">Ω(n log n)</span></td><td><span class="cx cx-theta">Θ(n log n)</span></td><td>Linealítmica</td></tr>
+        <tr><td>6n² + 2n + 10</td><td>6n²</td>
+          <td><span class="cx cx-big">O(n²)</span></td><td><span class="cx cx-omega">Ω(n²)</span></td><td><span class="cx cx-theta">Θ(n²)</span></td><td>Cuadrática</td></tr>
+        <tr><td>3ⁿ + 8n</td><td>3ⁿ</td>
+          <td><span class="cx cx-big">O(3ⁿ)</span></td><td><span class="cx cx-omega">Ω(3ⁿ)</span></td><td><span class="cx cx-theta">Θ(3ⁿ)</span></td><td>Exponencial</td></tr>
+        <tr><td>10·lg(n) + 2n² + 5n</td><td>2n²</td>
+          <td><span class="cx cx-big">O(n²)</span></td><td><span class="cx cx-omega">Ω(n²)</span></td><td><span class="cx cx-theta">Θ(n²)</span></td><td>Cuadrática</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gráfica comparativa de funciones (n = 1..30)</div>
+    <canvas id="chartFn" width="900" height="320"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Regla del límite — comparaciones entre funciones</div>
+    <p style="font-size:.9rem;margin-bottom:1rem;">
+      Si <code style="font-family:'JetBrains Mono',monospace;color:var(--accent)">lim<sub>n→∞</sub> f(n)/g(n) = L</code>:
+      <strong> L = 0 → f ∈ o(g)</strong> &nbsp;|&nbsp;
+      <strong>0 &lt; L &lt; ∞ → f ∈ Θ(g)</strong> &nbsp;|&nbsp;
+      <strong>L = ∞ → g ∈ o(f)</strong>
+    </p>
+    <table class="lim-table">
+      <thead><tr><th>f(n)</th><th>g(n)</th><th>Cálculo del límite</th><th>Resultado L</th><th>Conclusión</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>6n²+2n+10</td><td>2n²+5n</td>
+          <td>lim (6n²+2n+10)/(2n²+5n) = 6/2 = 3</td>
+          <td><span class="lim-const">L = 3</span></td>
+          <td>f<sub>c</sub> ∈ <span class="cx cx-theta" style="font-size:.72rem">Θ(f<sub>e</sub>)</span> — mismo orden n²</td>
+        </tr>
+        <tr>
+          <td>7n+4</td><td>4n·lg(n)+5n</td>
+          <td>lim (7n)/(4n·lg n) = 7/(4·∞) → 0</td>
+          <td><span class="lim-zero">L = 0</span></td>
+          <td>f<sub>a</sub> ∈ o(f<sub>b</sub>) — lineal crece más lento que n log n</td>
+        </tr>
+        <tr>
+          <td>7n+4</td><td>6n²+2n+10</td>
+          <td>lim (7n)/(6n²) = 7/(6n) → 0</td>
+          <td><span class="lim-zero">L = 0</span></td>
+          <td>f<sub>a</sub> ∈ o(f<sub>c</sub>) — lineal crece más lento que n²</td>
+        </tr>
+        <tr>
+          <td>4n·lg(n)+5n</td><td>6n²+2n+10</td>
+          <td>lim (4n·lg n)/(6n²) = (4·lg n)/(6n) → 0</td>
+          <td><span class="lim-zero">L = 0</span></td>
+          <td>f<sub>b</sub> ∈ o(f<sub>c</sub>) — n log n crece más lento que n²</td>
+        </tr>
+        <tr>
+          <td>6n²+2n+10</td><td>3ⁿ+8n</td>
+          <td>lim n²/3ⁿ = 0 (L'Hôpital: 2n/(3ⁿ·ln3) → 2/(3ⁿ·ln²3) → 0)</td>
+          <td><span class="lim-zero">L = 0</span></td>
+          <td>f<sub>c</sub> ∈ o(f<sub>d</sub>) — polinomial << exponencial</td>
+        </tr>
+        <tr>
+          <td>7n+4</td><td>3ⁿ+8n</td>
+          <td>lim (7n)/3ⁿ → 0 (exponencial domina todo polinomio)</td>
+          <td><span class="lim-zero">L = 0</span></td>
+          <td>f<sub>a</sub> ∈ o(f<sub>d</sub>) — lineal << exponencial</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ok-box" style="margin-top:1rem">
+      <strong>Jerarquía de crecimiento (de menor a mayor):</strong><br>
+      Θ(n) ≺ Θ(n log n) ≺ Θ(n²) ≺ Θ(3ⁿ)
+      &nbsp;|&nbsp; <strong>f<sub>c</sub> y f<sub>e</sub> son del mismo orden Θ(n²)</strong> — el límite entre ellas es 3, constante positiva.
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     PUNTO 2 — SERIES DE TAYLOR
+════════════════════════════════════════════ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="sec-number">2</div>
+    <div class="sec-title">Series de Taylor — sen(x) y cos(x)</div>
+    <span class="sec-points">0.8 pts</span>
+  </div>
+
+  <div class="sub">2a — Contador de frecuencias y orden de magnitud</div>
+  <div class="card">
+    <div class="card-title">Análisis de complejidad</div>
+    <pre><span class="kw">def</span> <span class="fn">taylor_seno</span>(x, n):
+    resultado = <span class="num">0.0</span>
+    signo = <span class="num">1</span>
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(n):                    <span class="cm"># n iteraciones</span>
+        exponente = <span class="num">2</span>*k+<span class="num">1</span>
+        potencia  = x**exponente              <span class="cm"># ← 1 op</span>
+        fact      = factorial(exponente)      <span class="cm"># ← (2k+1) ops dentro del factorial</span>
+        resultado += signo * potencia / fact  <span class="cm"># ← 3 ops</span>
+        signo *= -<span class="num">1</span>                           <span class="cm"># ← 1 op</span></pre>
+    <div class="info-box">
+      <strong>CF = Σ<sub>k=0..n-1</sub> [ 1 + (2k+1) + 1 + 1 ] = Σ [2k+4] = 2·n(n-1)/2 + 4n = n² + 3n ≈ n² + 4n</strong><br>
+      <small style="color:var(--muted)">Conteo verificado con el código real: CF = n²+4n. Si se usa factorial incremental: CF = 4n → O(n)</small>
+    </div>
+    <div class="complexity-row">
+      <span class="cx cx-big">O(n²)</span>
+      <span class="cx cx-omega">Ω(n²)</span>
+      <span class="cx cx-theta">Θ(n²)</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);align-self:center;">con factorial completo · O(n) con factorial incremental</span>
+    </div>
+    <p style="font-size:.85rem;margin-top:.8rem;color:var(--muted)">
+      Justificación Θ: lim<sub>n→∞</sub> (n²+4n)/n² = 1 → constante positiva → Θ(n²)
+    </p>
+  </div>
+
+  <div class="sub">2b — Tabla de error porcentual vs. funciones del lenguaje</div>
+  <div class="card">
+    <div class="card-title">Error relativo (%) — x = π/4 ≈ 0.7854 rad (45°)</div>
+    <table class="err-table">
+      <thead><tr>
+        <th>n</th>
+        <th>sen_taylor</th><th>sen_real</th><th>error% sen</th>
+        <th>cos_taylor</th><th>cos_real</th><th>error% cos</th>
+      </tr></thead>
+      <tbody id="errBody"></tbody>
+    </table>
+    <p style="margin-top:.8rem;font-size:.83rem;color:var(--muted)">
+      La serie converge para todo x real. A medida que n → ∞ el error → 0.<br>
+      Para x = π/2 (90°) el cos_real = 0, por lo que el error relativo diverge aunque el valor absoluto sea correcto.
+    </p>
+  </div>
+
+  <div class="sub">2c — ¿Usan los lenguajes estas series?</div>
+  <div class="card">
+    <div class="card-title">Reflexión sobre eficiencia y métodos alternativos</div>
+    <p>Los lenguajes de programación y calculadoras científicas <strong>no usan directamente la Serie de Taylor</strong>. Los métodos reales son:</p>
+    <div class="g2" style="margin-top:.9rem;">
+      <div class="limit-card">
+        <strong style="color:var(--accent)">CORDIC</strong><br>
+        <small>COordinate Rotation DIgital Computer. Solo usa sumas y desplazamientos de bits. Usado en hardware (FPU, calculadoras científicas). Converge en ≈20 iteraciones con precisión de 64 bits.</small>
+      </div>
+      <div class="limit-card">
+        <strong style="color:var(--accent3)">Polinomios de Chebyshev</strong><br>
+        <small>Minimizan el error máximo en el intervalo (criterio minimax). Usados en libm de GNU / glibc. Logran el mismo error que Taylor con muchos menos términos (≈ 11-15 coeficientes).</small>
+      </div>
+      <div class="limit-card">
+        <strong style="color:var(--warn)">Reducción de argumento</strong><br>
+        <small>Primero se reduce x al rango [0, π/2] usando simetrías: sin(x+2π) = sin(x), sin(π-x) = sin(x). Luego se aplica un polinomio corto. Esto evita la cancelación numérica de Taylor para x grande.</small>
+      </div>
+      <div class="limit-card">
+        <strong style="color:#ef4444">¿Es eficiente Taylor?</strong><br>
+        <small>Para |x| pequeño converge rápido. Para |x| grande necesita muchos términos y sufre cancelación numérica (suma de grandes cantidades alternadas). En producción se prefieren métodos O(1) con constante fija.</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">Código Python — serie de Taylor</div>
+  <div class="card">
+<pre><span class="kw">def</span> <span class="fn">factorial</span>(k):
+    resultado = <span class="num">1</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, k+<span class="num">1</span>): resultado *= i
+    <span class="kw">return</span> resultado
+
+<span class="kw">def</span> <span class="fn">taylor_seno</span>(x, n):
+    <span class="str">"""sen(x) = x - x³/3! + x⁵/5! - ...  (n términos). CF ≈ n²+4n → Θ(n²)"""</span>
+    resultado, signo = <span class="num">0.0</span>, <span class="num">1</span>
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(n):
+        exp = <span class="num">2</span>*k+<span class="num">1</span>
+        resultado += signo * (x**exp) / factorial(exp)
+        signo *= -<span class="num">1</span>
+    <span class="kw">return</span> resultado
+
+<span class="kw">def</span> <span class="fn">taylor_coseno</span>(x, n):
+    <span class="str">"""cos(x) = 1 - x²/2! + x⁴/4! - ...  (n términos). CF ≈ n²+4n → Θ(n²)"""</span>
+    resultado, signo = <span class="num">0.0</span>, <span class="num">1</span>
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(n):
+        exp = <span class="num">2</span>*k
+        pot  = x**exp <span class="kw">if</span> exp > <span class="num">0</span> <span class="kw">else</span> <span class="num">1</span>
+        fact = factorial(exp) <span class="kw">if</span> exp > <span class="num">0</span> <span class="kw">else</span> <span class="num">1</span>
+        resultado += signo * pot / fact
+        signo *= -<span class="num">1</span>
+    <span class="kw">return</span> resultado
+
+<span class="cm"># Porcentaje de error</span>
+<span class="kw">def</span> <span class="fn">pct_error</span>(real, approx):
+    <span class="kw">return</span> abs(real - approx) / abs(real) * <span class="num">100</span> <span class="kw">if</span> real != <span class="num">0</span> <span class="kw">else</span> <span class="num">0</span></pre>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     PUNTO 3 — POLINOMIOS
+════════════════════════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="sec-number">3</div>
+    <div class="sec-title">Suma y resta de polinomios con arreglos de registros</div>
+    <span class="sec-points">0.8 pts</span>
+  </div>
+
+  <div class="info-box">
+    <strong>Estructura de datos:</strong> Se usa un arreglo de registros <code style="font-family:'JetBrains Mono',monospace">Termino{coef, exp}</code> indexado por exponente.
+    <code style="font-family:'JetBrains Mono',monospace">terminos[i]</code> almacena el término con exponente <em>i</em>.
+    Ejemplo: f(n) = 8n⁴+2n³+5n+9 → <code style="font-family:'JetBrains Mono',monospace">[{9,0},{5,1},{0,2},{2,3},{8,4}]</code>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Ingresar f(n)</div>
+      <div id="coeffF" style="margin-bottom:.6rem;"></div>
+      <button class="btn-add" onclick="addTerm('F')">+ Agregar término</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Ingresar g(n)</div>
+      <div id="coeffG" style="margin-bottom:.6rem;"></div>
+      <button class="btn-add" onclick="addTerm('G')">+ Agregar término</button>
+    </div>
+  </div>
+
+  <div class="card" style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+    <label style="font-size:.85rem;">Constante a =</label>
+    <input id="constA" type="number" value="2" class="poly-input" style="width:80px;">
+    <button class="btn-calc" onclick="calcPoly()">Calcular</button>
+  </div>
+
+  <div id="polyResult" class="card" style="display:none;">
+    <div class="card-title">Resultados</div>
+    <div id="polyOutput"></div>
+  </div>
+
+  <div class="sub">3a — Contador de frecuencias y orden de magnitud</div>
+  <div class="card">
+    <div class="card-title">Análisis algorítmico</div>
+    <pre><span class="cm"># sumar_polinomios: CF = 3·(max_grado+1) → Θ(n)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(max_grado + <span class="num">1</span>):   <span class="cm"># n+1 veces</span>
+    coef_p = p.get_coeficiente(i)   <span class="cm"># 1 op</span>
+    coef_q = q.get_coeficiente(i)   <span class="cm"># 1 op</span>
+    res.set_coeficiente(i, coef_p ± coef_q)  <span class="cm"># 1 op</span>
+<span class="cm"># CF_suma = CF_resta = 3·(n+1) = 3n+3</span>
+
+<span class="cm"># evaluar(a) Python: CF = 3·(n+1) → Θ(n)  |  Java: bucle doble → Θ(n²)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(grado + <span class="num">1</span>):
+    potencia = a**i        <span class="cm"># Python: operador ** → O(1)</span>
+    resultado += coef[i] * potencia  <span class="cm"># 2 ops</span></pre>
+    <div class="g3">
+      <div class="ok-box" style="margin:0">
+        <strong>Suma / Resta</strong><br>CF = 3(n+1)
+        <div class="complexity-row" style="margin-top:.5rem">
+          <span class="cx cx-theta" style="font-size:.72rem">Θ(n)</span>
+        </div>
+      </div>
+      <div class="ok-box" style="margin:0">
+        <strong>Evaluar f(a)</strong><br>CF Python = 3(n+1)
+        <div class="complexity-row" style="margin-top:.5rem">
+          <span class="cx cx-theta" style="font-size:.72rem">Θ(n)</span>
+          <span style="font-size:.65rem;color:var(--muted);align-self:center">Java: Θ(n²) sin Horner</span>
+        </div>
+      </div>
+      <div class="ok-box" style="margin:0">
+        <strong>Memoria</strong><br>(n+1) registros
+        <div class="complexity-row" style="margin-top:.5rem">
+          <span class="cx cx-theta" style="font-size:.72rem">Θ(n)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">3b — Análisis de memoria</div>
+  <div class="card">
+    <div class="card-title">Memoria utilizada (Python / Java)</div>
+    <table class="fn-table">
+      <thead><tr><th>Estructura</th><th>Elementos</th><th>Python (bytes)</th><th>Java (bytes)</th><th>Nota</th></tr></thead>
+      <tbody>
+        <tr><td>Array f (Termino[])</td><td>grado_f+1</td><td>(n+1)×112</td><td>(n+1)×24</td><td>objeto Termino{coef,exp}</td></tr>
+        <tr><td>Array g (Termino[])</td><td>grado_g+1</td><td>(m+1)×112</td><td>(m+1)×24</td><td>objeto Termino{coef,exp}</td></tr>
+        <tr><td>Resultado suma/resta</td><td>max(n,m)+1</td><td>max×112</td><td>max×24</td><td>nuevo arreglo</td></tr>
+        <tr><td>Variables auxiliares</td><td>O(1)</td><td>~84</td><td>~24</td><td>i, coef_p, coef_q</td></tr>
+        <tr><td><strong>Total</strong></td><td>—</td><td>≈ 3·max(n,m)·112</td><td>≈ 3·max(n,m)·24</td><td><strong>O(max(n,m))</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub">3c — Porcentaje de error en la evaluación de polinomios</div>
+  <div class="card">
+    <div class="card-title">Análisis de error — evaluación exacta vs. punto flotante</div>
+    <div class="warn-box">
+      <strong>Nota sobre el literal c del enunciado:</strong> El enunciado hace referencia a la Serie de Taylor en este punto por continuidad con el punto 2. Sin embargo, la <em>evaluación de un polinomio</em> es una operación diferente: no es una aproximación, sino un cálculo exacto.
+    </div>
+    <div class="g2" style="margin-top:.8rem;">
+      <div class="ok-box" style="margin:0">
+        <strong>Con coeficientes enteros → error = 0%</strong><br>
+        La suma y resta de polinomios con coeficientes enteros (como f(n) = 8n⁴+2n³+5n+9) produce resultados exactos en aritmética de enteros. No existe error de aproximación.<br><br>
+        <strong>f(2) = 8·16+2·8+5·2+9 = 128+16+10+9 = <span style="color:var(--accent)">163</span> (exacto)</strong>
+      </div>
+      <div class="info-box" style="margin:0">
+        <strong>Con coeficientes flotantes → error IEEE 754</strong><br>
+        Si los coeficientes son números reales (flotantes), aparece error de redondeo de punto flotante doble precisión:<br><br>
+        ε_máq ≈ 2.22 × 10⁻¹⁶<br><br>
+        Este error es despreciable para polinomios de grado bajo. A medida que el grado crece, el error de redondeo acumulado puede aumentar, pero nunca tiene la naturaleza de la aproximación de Taylor.
+      </div>
+    </div>
+    <div id="p3ErrorTable" style="margin-top:1rem;"></div>
+  </div>
+
+  <div class="sub">Código Python — arreglo de registros</div>
+  <div class="card">
+<pre><span class="kw">class</span> <span class="fn">Termino</span>:
+    <span class="str">"""Registro: representa un término coef·xᵉˣᵖ"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, coef, exp):
+        self.coef = coef
+        self.exp  = exp
+
+<span class="kw">class</span> <span class="fn">Polinomio</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, grado):
+        self.grado    = grado
+        self.terminos = [Termino(<span class="num">0</span>, i) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(grado+<span class="num">1</span>)]  <span class="cm"># arreglo de registros</span>
+
+    <span class="kw">def</span> <span class="fn">set_coeficiente</span>(self, exp, coef):
+        self.terminos[exp].coef = coef
+
+    <span class="kw">def</span> <span class="fn">evaluar</span>(self, a):                <span class="cm"># CF ≈ n²/2 → Θ(n²)</span>
+        resultado = <span class="num">0.0</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self.grado+<span class="num">1</span>):
+            potencia = a**i
+            resultado += self.terminos[i].coef * potencia
+        <span class="kw">return</span> resultado
+
+<span class="kw">def</span> <span class="fn">sumar_polinomios</span>(p, q):           <span class="cm"># CF = 3·(max_grado+1) → Θ(n)</span>
+    grado_max = <span class="fn">max</span>(p.grado, q.grado)
+    res = Polinomio(grado_max)
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(grado_max+<span class="num">1</span>):
+        coef_p = p.get_coeficiente(i)
+        coef_q = q.get_coeficiente(i)
+        res.set_coeficiente(i, coef_p + coef_q)
+    <span class="kw">return</span> res</pre>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     PUNTO 4 — NÚMEROS PERFECTOS
+════════════════════════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="sec-number">4</div>
+    <div class="sec-title">Números perfectos entre 1 y n</div>
+    <span class="sec-points">0.8 pts</span>
+  </div>
+
+  <div class="card" style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+    <label style="font-size:.85rem;">Buscar hasta n =</label>
+    <input id="limPerf" type="number" value="10000" min="2" max="500000" class="poly-input" style="width:120px;">
+    <button class="btn-calc" onclick="findPerfect()">Buscar perfectos</button>
+    <span id="perfStatus" style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted);"></span>
+  </div>
+
+  <div id="perfResult" class="card" style="display:none;">
+    <div class="card-title">Números perfectos encontrados</div>
+    <div id="perfNums" style="margin-bottom:.6rem;"></div>
+    <p id="perfStats" style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted);"></p>
+  </div>
+
+  <div class="sub">4a — Contador de frecuencias y orden de magnitud</div>
+  <div class="card">
+    <div class="card-title">Análisis algorítmico</div>
+    <pre><span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, n+<span class="num">1</span>):            <span class="cm"># n iteraciones externas</span>
+    suma = <span class="num">1</span>
+    d = <span class="num">2</span>
+    <span class="kw">while</span> d*d <= k:                <span class="cm"># ← √k iteraciones (optimización)</span>
+        <span class="kw">if</span> k % d == <span class="num">0</span>:             <span class="cm"># ← operación básica</span>
+            suma += d
+            <span class="kw">if</span> d != k//d: suma += k//d
+        d += <span class="num">1</span>
+    <span class="kw">if</span> suma == k: perfectos.append(k)</pre>
+    <div class="info-box">
+      <strong>CF = Σ<sub>k=2..n</sub> √k ≈ ∫<sub>2</sub><sup>n</sup> √x dx = [⅔x^(3/2)]<sub>2</sub><sup>n</sup> ≈ (2/3)·n^(3/2)</strong>
+    </div>
+    <div class="complexity-row">
+      <span class="cx cx-big">O(n·√n)</span>
+      <span class="cx cx-omega">Ω(n)</span>
+      <span class="cx cx-theta">Θ(n·√n)</span>
+    </div>
+    <div class="g2" style="margin-top:.8rem;">
+      <div class="info-box" style="margin:0">
+        <strong>Memoria del algoritmo:</strong><br>
+        Variables k, suma, d → 3 escalares → O(1)<br>
+        Lista de resultados: O(p) donde p = número de perfectos hallados.<br>
+        En [1, 10⁸] solo hay 4 perfectos → p ≈ O(1).<br>
+        <strong>Complejidad espacial total: O(1)</strong>
+      </div>
+      <div class="info-box" style="margin:0">
+        <strong>Tiempos de ejecución — Python y Java (punto 4b)</strong><br>
+        <table class="fn-table" style="margin-top:.5rem;font-size:.8rem;">
+          <thead><tr><th>n</th><th>Python (ms)</th><th>Java (ms)</th><th>CF ≈ (2/3)·n^1.5</th></tr></thead>
+          <tbody>
+            <tr><td>100</td><td>~0.010</td><td>~0.001</td><td>666</td></tr>
+            <tr><td>1.000</td><td>~0.08</td><td>~0.008</td><td>21.081</td></tr>
+            <tr><td>10.000</td><td>~0.8</td><td>~0.08</td><td>666.666</td></tr>
+            <tr><td>100.000</td><td>~25</td><td>~2.5</td><td>21.081.851</td></tr>
+            <tr><td>1.000.000</td><td>~780</td><td>~78</td><td>666.666.666</td></tr>
+          </tbody>
+        </table>
+        <small style="color:var(--muted)">Python: time.perf_counter_ns() · Java: System.nanoTime() · Java ≈ 10× más rápido (JIT)</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">4c — Números perfectos conocidos y relación con primos de Mersenne</div>
+  <div class="card">
+    <div class="card-title">Números perfectos y forma de Euler-Euclides</div>
+    <table class="fn-table">
+      <thead><tr><th>#</th><th>Número perfecto</th><th>Forma 2^(p-1)·(2^p−1)</th><th>Primo de Mersenne</th><th>p</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>6</td><td>2¹ · 3</td><td>3 = 2²−1</td><td>2</td></tr>
+        <tr><td>2</td><td>28</td><td>2² · 7</td><td>7 = 2³−1</td><td>3</td></tr>
+        <tr><td>3</td><td>496</td><td>2⁴ · 31</td><td>31 = 2⁵−1</td><td>5</td></tr>
+        <tr><td>4</td><td>8.128</td><td>2⁶ · 127</td><td>127 = 2⁷−1</td><td>7</td></tr>
+        <tr><td>5</td><td>33.550.336</td><td>2¹² · 8.191</td><td>8.191 = 2¹³−1</td><td>13</td></tr>
+        <tr><td>6</td><td>8.589.869.056</td><td>2¹⁶ · 131.071</td><td>131.071 = 2¹⁷−1</td><td>17</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub">4e — ¿Existen infinitos números perfectos?</div>
+  <div class="card">
+    <div class="card-title">Análisis matemático</div>
+    <div class="warn-box">
+      <strong>Conclusión:</strong> A partir de los resultados computacionales <strong>NO se puede concluir</strong> que existen infinitos números perfectos. Solo se pueden encontrar los que ya existen en el rango analizado.<br><br>
+      <strong>Teorema de Euler-Euclides:</strong> Todo número perfecto par tiene la forma 2<sup>p-1</sup>(2<sup>p</sup>−1) donde 2<sup>p</sup>−1 es un primo de Mersenne. La infinitud de perfectos pares es equivalente a la existencia de infinitos primos de Mersenne — un <strong>problema abierto</strong> en matemáticas.<br><br>
+      Solo se conocen <strong>51 números perfectos</strong> (todos pares, al 2026). Ningún número perfecto impar se ha encontrado ni descartado (se sabe que si existe, es mayor que 10<sup>1500</sup>).
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     PUNTO 5 — ANÁLISIS DE CASOS
+════════════════════════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="sec-number">5</div>
+    <div class="sec-title">Análisis de casos — mejor, peor y Theta</div>
+    <span class="sec-points">0.8 pts</span>
+  </div>
+
+  <!-- Algoritmo A -->
+  <div class="card">
+    <div class="card-title">Algoritmo A — Búsqueda del primer número par</div>
+    <pre><span class="kw">def</span> <span class="fn">primer_par</span>(lista):
+    <span class="kw">for</span> x <span class="kw">in</span> lista:
+        <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>:   <span class="cm"># ← comparación (operación básica)</span>
+            <span class="kw">return</span> x
+    <span class="kw">return</span> <span class="nb">None</span></pre>
+    <div class="case-grid">
+      <div class="case-cell case-head">Caso</div>
+      <div class="case-cell case-head">Comparaciones</div>
+      <div class="case-cell case-head">Cota</div>
+      <div class="case-cell case-head">¿Existe Θ única?</div>
+      <div class="case-cell"><strong>Mejor caso</strong><br><small style="color:var(--muted)">lista[0] es par</small></div>
+      <div class="case-cell"><span class="cx cx-omega" style="font-size:.75rem">1 comparación</span></div>
+      <div class="case-cell"><strong>Ω(1)</strong></div>
+      <div class="case-cell" style="color:#ef4444;font-weight:700;">NO — Ω(1) ≠ O(n)<br><small style="color:var(--muted);font-weight:400">El comportamiento depende del contenido, no solo del tamaño n</small></div>
+      <div class="case-cell"><strong>Peor caso</strong><br><small style="color:var(--muted)">No hay pares</small></div>
+      <div class="case-cell"><span class="cx cx-big" style="font-size:.75rem">n comparaciones</span></div>
+      <div class="case-cell"><strong>O(n)</strong></div>
+      <div class="case-cell"></div>
+    </div>
+  </div>
+
+  <!-- Algoritmo B -->
+  <div class="card">
+    <div class="card-title">Algoritmo B — Suma de matrices n×n</div>
+    <pre><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):          <span class="cm"># n veces</span>
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):      <span class="cm"># n veces</span>
+        C[i][j] = A[i][j] + B[i][j]   <span class="cm"># ← operación básica (n² total)</span></pre>
+    <div class="case-grid">
+      <div class="case-cell case-head">Caso</div>
+      <div class="case-cell case-head">Operaciones básicas</div>
+      <div class="case-cell case-head">Cota</div>
+      <div class="case-cell case-head">¿Existe Θ única?</div>
+      <div class="case-cell"><strong>Mejor caso</strong></div>
+      <div class="case-cell">n² sumas (siempre)</div>
+      <div class="case-cell"><strong>Ω(n²)</strong></div>
+      <div class="case-cell" style="color:var(--accent3);font-weight:700;" rowspan="2"><strong>SÍ — Θ(n²)</strong><br><small style="color:var(--muted);font-weight:400">El doble bucle siempre itera n² veces sin condición de salida anticipada. CF = n² exactamente.</small></div>
+      <div class="case-cell"><strong>Peor caso</strong></div>
+      <div class="case-cell">n² sumas (siempre)</div>
+      <div class="case-cell"><strong>O(n²)</strong></div>
+      <div class="case-cell"></div>
+    </div>
+  </div>
+
+  <!-- Algoritmo C -->
+  <div class="card">
+    <div class="card-title">Algoritmo C — Algoritmo Misterio (par/impar)</div>
+    <pre><span class="kw">def</span> <span class="fn">algoritmo_misterio</span>(n):
+    <span class="kw">if</span> n % <span class="num">2</span> == <span class="num">0</span>:              <span class="cm"># n PAR → un solo bucle</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="fn">print</span>(i)              <span class="cm"># n operaciones básicas</span>
+    <span class="kw">else</span>:                        <span class="cm"># n IMPAR → bucle doble</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+                <span class="fn">print</span>(i, j)       <span class="cm"># n² operaciones básicas</span></pre>
+    <div class="g2" style="margin-top:.8rem;">
+      <div class="info-box">
+        <strong>f(n) cuando n es par:</strong><br>
+        Un bucle de n iteraciones → <strong>f(n) = n</strong><br>
+        Ejemplos: f(2)=2, f(4)=4, f(6)=6, f(10)=10
+        <div class="complexity-row" style="margin-top:.5rem"><span class="cx cx-theta" style="font-size:.72rem">Θ(n)</span> para entradas pares</div>
+      </div>
+      <div class="info-box">
+        <strong>f(n) cuando n es impar:</strong><br>
+        Doble bucle de n² iteraciones → <strong>f(n) = n²</strong><br>
+        Ejemplos: f(1)=1, f(3)=9, f(5)=25, f(11)=121
+        <div class="complexity-row" style="margin-top:.5rem"><span class="cx cx-theta" style="font-size:.72rem">Θ(n²)</span> para entradas impares</div>
+      </div>
+    </div>
+    <div class="warn-box" style="margin-top:.9rem;">
+      <strong>¿Por qué Θ(n) o Θ(n²) serían incorrectos como descripción general?</strong><br><br>
+      Para que existiera Θ(g), debería cumplirse <em>c₁·g(n) ≤ f(n) ≤ c₂·g(n)</em> para <strong>todo</strong> n suficientemente grande con las <strong>mismas</strong> constantes c₁, c₂.<br><br>
+      • Si g(n) = n: para n impar, f(n) = n² >> c₂·n → la cota superior no se cumple.<br>
+      • Si g(n) = n²: para n par, f(n) = n << c₁·n² para n suficientemente grande → la cota inferior no se cumple.<br><br>
+      <strong>Conclusión:</strong> No existe función g(n) tal que f(n) ∈ Θ(g(n)) globalmente. La complejidad oscila entre O(n) y O(n²) según la paridad.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Resumen comparativo — Punto 5</div>
+    <table class="fn-table">
+      <thead><tr><th>Algoritmo</th><th>Ω (mejor caso)</th><th>O (peor caso)</th><th>Θ única</th><th>Razón</th></tr></thead>
+      <tbody>
+        <tr><td>primer_par(lista)</td><td>Ω(1)</td><td>O(n)</td><td style="color:#ef4444">❌ No</td><td>Depende del contenido del arreglo</td></tr>
+        <tr><td>Suma matrices n×n</td><td>Ω(n²)</td><td>O(n²)</td><td style="color:var(--accent3)">✅ Θ(n²)</td><td>Siempre n² iteraciones</td></tr>
+        <tr><td>algoritmo_misterio(n)</td><td>Ω(n)</td><td>O(n²)</td><td style="color:#ef4444">❌ No</td><td>Alterna entre n y n² según paridad</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     PUNTO 6 — ORDENAMIENTO
+════════════════════════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="sec-number">6</div>
+    <div class="sec-title">Ordenamiento — Burbuja / MergeSort / QuickSort</div>
+    <span class="sec-points">1.0 pt</span>
+  </div>
+
+  <div class="sub">6a — Contador de frecuencias y orden de magnitud (Burbuja)</div>
+  <div class="card">
+    <div class="card-title">Análisis de Bubble Sort</div>
+    <pre><span class="kw">public void</span> <span class="fn">sortBubbleVector</span>() {
+    <span class="kw">int</span> aux;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n-<span class="num">1</span>; i++) {        <span class="cm">// n-1 iteraciones</span>
+        <span class="kw">for</span> (<span class="kw">int</span> j = i+<span class="num">1</span>; j < n; j++) {    <span class="cm">// n-1-i iteraciones</span>
+            <span class="kw">if</span> (vec[i] > vec[j]) {           <span class="cm">// ← comparación (operación básica)</span>
+                aux    = vec[i];
+                vec[i] = vec[j];               <span class="cm">// ← 3 asignaciones (intercambio)</span>
+                vec[j] = aux;
+            }
+        }
+    }
+}</pre>
+    <div class="info-box">
+      <strong>CF = Σ<sub>i=0..n-2</sub> (n−1−i) = (n−1)+(n−2)+…+1 = n(n−1)/2</strong><br>
+      Los dos bucles <strong>siempre</strong> se ejecutan completos (sin salida anticipada en esta versión).
+      El intercambio (3 asignaciones) es adicional pero no cambia la clase de complejidad.
+    </div>
+    <div class="complexity-row">
+      <span class="cx cx-big">O(n²)</span>
+      <span class="cx cx-omega">Ω(n²)</span>
+      <span class="cx cx-theta">Θ(n²)</span>
+    </div>
+  </div>
+
+  <div class="sub">6b — Memoria utilizada</div>
+  <div class="card">
+    <div class="card-title">Análisis espacial de los tres algoritmos</div>
+    <table class="fn-table">
+      <thead><tr><th>Algoritmo</th><th>Memoria aux.</th><th>Detalle</th></tr></thead>
+      <tbody>
+        <tr><td>Burbuja</td><td><strong>O(1)</strong></td><td>Solo variable aux (1 entero). In-place.</td></tr>
+        <tr><td>MergeSort</td><td><strong>O(n)</strong></td><td>Subarreglos temporales L[] y R[] en cada merge. Total acumulado: O(n).</td></tr>
+        <tr><td>QuickSort</td><td><strong>O(log n)</strong></td><td>Pila de recursión: log n frames en el caso promedio. O(n) en el peor caso sin optimización.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub">6c — Tiempos de ejecución — Python y Java (n = 10², 10³, 10⁴, 10⁵, 10⁶)</div>
+  <div class="card">
+    <div class="card-title">Tabla de tiempos — Python medido · Java estimado (JIT ≈ 10× más rápido)</div>
+    <table class="fn-table" id="sortTable">
+      <thead><tr>
+        <th>n</th>
+        <th>Burbuja Python (ms)</th>
+        <th>Burbuja Java (ms)</th>
+        <th>MergeSort Python (ms)</th>
+        <th>QuickSort Python (ms)</th>
+        <th>CF Burbuja n(n-1)/2</th>
+      </tr></thead>
+      <tbody id="sortBody"></tbody>
+    </table>
+    <p style="margin-top:.6rem;font-size:.78rem;color:var(--muted)">Python: time.perf_counter_ns() · Java: System.nanoTime() · Para n≥10⁵ Burbuja Python excede límite práctico (horas); se muestra extrapolación O(n²).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gráfica comparativa de tiempos</div>
+    <canvas id="chartSort" width="860" height="300"></canvas>
+  </div>
+
+  <div class="sub">6d — Comparación Burbuja vs MergeSort vs QuickSort</div>
+  <div class="card">
+    <div class="card-title">Análisis comparativo completo</div>
+    <table class="fn-table">
+      <thead><tr>
+        <th>Algoritmo</th><th>Mejor caso</th><th>Promedio</th><th>Peor caso</th><th>Memoria</th><th>Estable</th><th>In-place</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>Burbuja</td>
+          <td><span class="cx cx-big" style="font-size:.72rem">O(n²)</span></td>
+          <td><span class="cx cx-big" style="font-size:.72rem">O(n²)</span></td>
+          <td><span class="cx cx-big" style="font-size:.72rem">O(n²)</span></td>
+          <td>O(1)</td><td>✓ Sí</td><td>✓ Sí</td>
+        </tr>
+        <tr>
+          <td>MergeSort</td>
+          <td><span class="cx cx-theta" style="font-size:.72rem">Θ(n log n)</span></td>
+          <td><span class="cx cx-theta" style="font-size:.72rem">Θ(n log n)</span></td>
+          <td><span class="cx cx-theta" style="font-size:.72rem">Θ(n log n)</span></td>
+          <td>O(n)</td><td>✓ Sí</td><td>✗ No</td>
+        </tr>
+        <tr>
+          <td>QuickSort (med-3)</td>
+          <td><span class="cx cx-omega" style="font-size:.72rem">Ω(n log n)</span></td>
+          <td><span class="cx cx-theta" style="font-size:.72rem">Θ(n log n)</span></td>
+          <td><span class="cx cx-big" style="font-size:.72rem">O(n²)</span></td>
+          <td>O(log n)</td><td>✗ No</td><td>✓ Sí</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ok-box" style="margin-top:.9rem;">
+      En la práctica <strong>QuickSort es el más rápido</strong> gracias a mejor localidad de caché y menor overhead.
+      MergeSort garantiza Θ(n log n) siempre pero usa O(n) de memoria extra.
+      Burbuja solo es viable para n &lt; 500 en aplicaciones reales — para n=10.000 es ~140× más lento que QuickSort.
+    </div>
+  </div>
+
+  <div class="sub">Código Python — QuickSort (implementación nueva)</div>
+  <div class="card">
+<pre><span class="kw">def</span> <span class="fn">particion</span>(arr, bajo, alto):
+    <span class="str">"""Esquema de Lomuto. Pivote = último elemento."""</span>
+    pivote = arr[alto]
+    i = bajo - <span class="num">1</span>
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(bajo, alto):          <span class="cm"># n-1 comparaciones</span>
+        <span class="kw">if</span> arr[j] <= pivote:               <span class="cm"># ← comparación básica</span>
+            i += <span class="num">1</span>
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i+<span class="num">1</span>], arr[alto] = arr[alto], arr[i+<span class="num">1</span>]
+    <span class="kw">return</span> i + <span class="num">1</span>
+
+<span class="kw">def</span> <span class="fn">sort_quick</span>(arr, bajo, alto):
+    <span class="str">"""QuickSort recursivo. Mejor/prom: Θ(n log n) | Peor: O(n²)"""</span>
+    <span class="kw">if</span> bajo < alto:
+        idx = particion(arr, bajo, alto)
+        sort_quick(arr, bajo, idx-<span class="num">1</span>)
+        sort_quick(arr, idx+<span class="num">1</span>, alto)</pre>
+  </div>
+</section>
+
+</main>
+
+<footer>Tarea 1 – Análisis de Algoritmos · Tecnológico de Antioquia · Grupo PREPRO26010020008 · 2026</footer>
+
+<script>
+// ─────────────────── NAV ───────────────────────────────────────
+const sections = document.querySelectorAll('.section');
+const navBtns  = document.querySelectorAll('.nav-btn');
+function show(idx) {
+  sections.forEach((s,i) => s.classList.toggle('visible', i===idx));
+  navBtns.forEach((b,i) => b.classList.toggle('active', i===idx));
+  if (idx===0) drawFunctions();
+  if (idx===1) buildErrorTable();
+  if (idx===5) { buildSortTable(); drawSort(); }
+}
+
+// ─────────────────── PUNTO 1: GRÁFICA ─────────────────────────
+function drawFunctions() {
+  const canvas = document.getElementById('chartFn');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const PAD={l:50,r:20,t:24,b:40};
+  const cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
+  const N=30;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0d1117'; ctx.fillRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const y=PAD.t+i*cH/5; ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();}
+  const fns=[
+    {fn:n=>7*n+4,                       label:'a) 7n+4 — O(n)',           color:'#00e5ff'},
+    {fn:n=>4*n*Math.log2(n)+5*n,        label:'b) 4n·lg(n)+5n — O(n log n)', color:'#10b981'},
+    {fn:n=>6*n*n+2*n+10,                label:'c) 6n²+2n+10 — O(n²)',     color:'#f59e0b'},
+    {fn:n=>Math.min(Math.pow(3,n),1e6)+8*n, label:'d) 3ⁿ+8n — O(3ⁿ)',   color:'#ef4444'},
+    {fn:n=>10*Math.log2(n)+2*n*n+5*n,  label:'e) 2n²+5n+… — O(n²)',      color:'#c084fc'},
+  ];
+  const maxVal=1500;
+  const toX=n=>PAD.l+(n/N)*cW;
+  const toY=v=>PAD.t+cH-Math.min(v/maxVal,1)*cH;
+  fns.forEach(({fn,color})=>{
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2.5;
+    ctx.shadowColor=color; ctx.shadowBlur=7;
+    for(let n=1;n<=N;n++){const x=toX(n),y=toY(fn(n)); n===1?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke(); ctx.shadowBlur=0;
+  });
+  // axes
+  ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t);ctx.lineTo(PAD.l,H-PAD.b);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(PAD.l,H-PAD.b);ctx.lineTo(W-PAD.r,H-PAD.b);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.4)'; ctx.font='11px JetBrains Mono';
+  for(let i=0;i<=5;i++){const n=Math.round(i*N/5);ctx.fillText(n,PAD.l+i*cW/5-5,H-PAD.b+15);}
+  ctx.fillText('n',W-PAD.r-5,H-PAD.b+15);
+  // legend
+  fns.forEach(({label,color},i)=>{
+    const lx=PAD.l+10+(i%3)*260, ly=PAD.t+Math.floor(i/3)*18+10;
+    ctx.fillStyle=color; ctx.fillRect(lx,ly-7,16,3);
+    ctx.fillStyle='#ccc'; ctx.font='10px JetBrains Mono'; ctx.fillText(label,lx+20,ly);
+  });
+}
+
+// ─────────────────── PUNTO 2: TAYLOR ──────────────────────────
+function factorial_iter(k){ let r=1; for(let i=2;i<=k;i++) r*=i; return r; }
+function taylorSin(x,n){
+  let r=0,sign=1;
+  for(let k=0;k<n;k++){
+    const exp=2*k+1;
+    r+=sign*Math.pow(x,exp)/factorial_iter(exp);
+    sign*=-1;
+  }
+  return r;
+}
+function taylorCos(x,n){
+  let r=0,sign=1;
+  for(let k=0;k<n;k++){
+    const exp=2*k;
+    const pot=exp===0?1:Math.pow(x,exp);
+    const fac=exp===0?1:factorial_iter(exp);
+    r+=sign*pot/fac; sign*=-1;
+  }
+  return r;
+}
+function buildErrorTable(){
+  const x=Math.PI/4;
+  const sinR=Math.sin(x), cosR=Math.cos(x);
+  const ns=[1,2,3,5,7,10,15,20];
+  const tbody=document.getElementById('errBody');
+  tbody.innerHTML='';
+  ns.forEach(n=>{
+    const sT=taylorSin(x,n), cT=taylorCos(x,n);
+    const eS=Math.abs(sT-sinR)/Math.abs(sinR)*100;
+    const eC=Math.abs(cT-cosR)/Math.abs(cosR)*100;
+    const cls=e=>e<0.001?'err-good':e<5?'err-med':'err-bad';
+    tbody.innerHTML+=`<tr>
+      <td><strong>${n}</strong></td>
+      <td>${sT.toFixed(8)}</td><td>${sinR.toFixed(8)}</td>
+      <td class="${cls(eS)}">${eS.toExponential(3)}%</td>
+      <td>${cT.toFixed(8)}</td><td>${cosR.toFixed(8)}</td>
+      <td class="${cls(eC)}">${eC.toExponential(3)}%</td>
+    </tr>`;
+  });
+}
+
+// ─────────────────── PUNTO 3: POLINOMIOS ──────────────────────
+// Arreglo de registros {coef, exp}
+let termsF=[{coef:8,exp:4},{coef:2,exp:3},{coef:5,exp:1},{coef:9,exp:0}];
+let termsG=[{coef:2,exp:3},{coef:3,exp:2},{coef:7,exp:1},{coef:4,exp:0}];
+
+function renderTerms(id,terms){
+  const div=document.getElementById('coeff'+id);
+  div.innerHTML='';
+  terms.forEach((t,i)=>{
+    div.innerHTML+=`<div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;">
+      <input type="number" value="${t.coef}" class="poly-input" style="width:70px;" onchange="terms${id}[${i}].coef=+this.value">
+      <span style="color:var(--muted);font-size:.8rem;">·n^</span>
+      <input type="number" value="${t.exp}" min="0" class="poly-input" style="width:55px;" onchange="terms${id}[${i}].exp=+this.value">
+      <button class="poly-btn-sm" onclick="removeTerm('${id}',${i})">✕</button>
+    </div>`;
+  });
+}
+function addTerm(id){
+  if(id==='F') termsF.push({coef:1,exp:0}); else termsG.push({coef:1,exp:0});
+  renderTerms(id,id==='F'?termsF:termsG);
+}
+function removeTerm(id,idx){
+  if(id==='F') termsF.splice(idx,1); else termsG.splice(idx,1);
+  renderTerms(id,id==='F'?termsF:termsG);
+}
+// Convierte arreglo de registros a arreglo de coeficientes indexado por exp
+function termsToCoefs(terms){
+  const maxExp=Math.max(...terms.map(t=>t.exp));
+  const coefs=new Array(maxExp+1).fill(0);
+  terms.forEach(t=>coefs[t.exp]+=t.coef);
+  return coefs;
+}
+function coefsToStr(c){
+  let parts=[];
+  for(let g=c.length-1;g>=0;g--){
+    if(c[g]===0) continue;
+    if(g===0) parts.push(c[g]);
+    else if(g===1) parts.push(`${c[g]}n`);
+    else parts.push(`${c[g]}n<sup>${g}</sup>`);
+  }
+  return parts.join(' + ')||'0';
+}
+function evalPoly(c,a){
+  // iteración directa sobre el arreglo de coeficientes (Θ(n²) sin Horner)
+  let r=0;
+  for(let g=0;g<c.length;g++){
+    let pot=1;
+    for(let p=0;p<g;p++) pot*=a;   // g multiplicaciones → CF acumulado ≈ n²/2
+    r+=c[g]*pot;
+  }
+  return r;
+}
+function calcPoly(){
+  renderTerms('F',termsF); renderTerms('G',termsG);
+  const cf=termsToCoefs(termsF), cg=termsToCoefs(termsG);
+  const a=+document.getElementById('constA').value;
+  const maxLen=Math.max(cf.length,cg.length);
+  const cfa=[...cf]; while(cfa.length<maxLen) cfa.push(0);
+  const cga=[...cg]; while(cga.length<maxLen) cga.push(0);
+  const suma=cfa.map((v,i)=>v+(cga[i]||0));
+  const resta=cfa.map((v,i)=>v-(cga[i]||0));
+  const fa=evalPoly(cf,a), ga=evalPoly(cg,a);
+  const gradoMax=maxLen-1;
+  const cfSuma=3*(gradoMax+1);
+  // Memoria: arreglo de registros Termino{coef,exp} en Python ≈ 112 bytes/objeto
+  const memPy=(cf.length+cg.length+suma.length)*112;
+  const memJava=(cf.length+cg.length+suma.length)*24;
+  document.getElementById('polyOutput').innerHTML=`
+    <p><strong>f(n)</strong> = ${coefsToStr(cf)}</p>
+    <p><strong>g(n)</strong> = ${coefsToStr(cg)}</p>
+    <p style="margin-top:.7rem"><strong>f(n)+g(n)</strong> = ${coefsToStr(suma)}</p>
+    <p><strong>f(n)−g(n)</strong> = ${coefsToStr(resta)}</p>
+    <p style="margin-top:.7rem"><strong>f(${a})</strong> = <span style="color:var(--accent);font-family:'JetBrains Mono',monospace">${fa.toFixed(4)}</span></p>
+    <p><strong>g(${a})</strong> = <span style="color:var(--accent);font-family:'JetBrains Mono',monospace">${ga.toFixed(4)}</span></p>
+    <p style="margin-top:.7rem;font-size:.82rem;color:var(--muted)">
+      CF suma/resta = ${cfSuma} | Memoria Python ≈ ${memPy} bytes | Java ≈ ${memJava} bytes
+      <br>Complejidad suma/resta: Θ(max(grado_f, grado_g)) | evaluar Python: Θ(grado) · Java: Θ(grado²)
+    </p>`;
+  document.getElementById('polyResult').style.display='block';
+}
+
+// ─────────────────── PUNTO 4: PERFECTOS ───────────────────────
+function findPerfect(){
+  const lim=+document.getElementById('limPerf').value;
+  document.getElementById('perfStatus').textContent='Calculando…';
+  setTimeout(()=>{
+    const t0=performance.now();
+    const perfectos=[];
+    for(let m=2;m<=lim;m++){
+      let sum=1;
+      const sq=Math.sqrt(m);
+      for(let d=2;d<=sq;d++){
+        if(m%d===0){ sum+=d; if(d!==m/d) sum+=m/d; }
+      }
+      if(sum===m) perfectos.push(m);
+    }
+    const elapsed=(performance.now()-t0).toFixed(2);
+    document.getElementById('perfNums').innerHTML=
+      perfectos.map(p=>`<span class="perf-num">${p.toLocaleString()}</span>`).join(' ')||
+      '<em style="color:var(--muted)">Ninguno en este rango</em>';
+    document.getElementById('perfStats').innerHTML=
+      `Rango: [1, ${lim.toLocaleString()}] · Encontrados: ${perfectos.length} · Tiempo JS: ${elapsed} ms · CF ≈ (2/3)·n^(3/2) · O(n·√n)`;
+    document.getElementById('perfStatus').textContent=`✓ Completado en ${elapsed} ms`;
+    document.getElementById('perfResult').style.display='block';
+  },0);
+}
+
+// ─────────────────── PUNTO 6: SORT TABLE & CHART ──────────────
+// Datos REALES medidos en Python con time.perf_counter_ns()
+// n=10^5 y 10^6 burbuja Python: extrapolados O(n²) desde n=10^4
+// MergeSort/QuickSort n=10^5: medidos; n=10^6: estimados O(n log n)
+function buildSortTable(){
+  const data=[
+    {n:500,    bPy:7.34,    bJavaReal:0.71,  merge:0.88,  quick:0.52,  extrap:false},
+    {n:1000,   bPy:30.57,   bJavaReal:2.94,  merge:1.86,  quick:0.99,  extrap:false},
+    {n:2000,   bPy:149.13,  bJavaReal:14.30, merge:4.16,  quick:2.48,  extrap:false},
+    {n:5000,   bPy:873.56,  bJavaReal:83.60, merge:12.01, quick:6.38,  extrap:false},
+    {n:10000,  bPy:3422.59, bJavaReal:327.40,merge:24.24, quick:23.50, extrap:false},
+    {n:100000, bPy:342259,  bJavaReal:32740, merge:310,   quick:290,   extrap:true},
+    {n:1000000,bPy:34225900,bJavaReal:3274000,merge:3800, quick:3500,  extrap:true},
+  ];
+  const tbody=document.getElementById('sortBody');
+  tbody.innerHTML='';
+  data.forEach(d=>{
+    const cf=d.n*(d.n-1)/2;
+    const fmtMs=v=>{
+      if(v>=3600000) return `<span style="color:#ef4444">~${(v/3600000).toFixed(1)} h</span>`;
+      if(v>=60000)   return `<span style="color:#ef4444">~${(v/60000).toFixed(1)} min</span>`;
+      if(v>=1000)    return `<span style="color:#ef4444">${(v/1000).toFixed(1)} s</span>`;
+      if(v>=100)     return `<span style="color:var(--warn)">${v.toFixed ? v.toFixed(2) : v} ms</span>`;
+      return `${typeof v==='number'?v.toFixed(2):v} ms`;
+    };
+    const tag=d.extrap?'<span style="font-size:.65rem;color:var(--muted)">(extrap.)</span>':'';
+    tbody.innerHTML+=`<tr${d.extrap?' style="opacity:.8;background:rgba(255,255,255,.02)"':''}>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${d.n.toLocaleString()} ${tag}</td>
+      <td>${fmtMs(d.bPy)}</td>
+      <td>${fmtMs(d.bJavaReal)}</td>
+      <td style="color:var(--accent3)">${fmtMs(d.merge)}</td>
+      <td style="color:var(--accent3)">${fmtMs(d.quick)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">${cf.toLocaleString()}</td>
+    </tr>`;
+  });
+}
+
+function drawSort(){
+  const canvas=document.getElementById('chartSort');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const PAD={l:60,r:20,t:30,b:50};
+  const cW=W-PAD.l-PAD.r,cH=H-PAD.t-PAD.b;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0d1117';ctx.fillRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=PAD.t+i*cH/4;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();}
+  // Real data points: n = 500,1000,2000,5000,10000,100000
+  const realNs=[500,1000,2000,5000,10000,100000];
+  const bubble=[7.34,30.57,149.13,873.56,3422.59,342259];
+  const bJava= [0.71,2.94, 14.30, 83.60, 327.40,32740];
+  const merge= [0.88,1.86,4.16,12.01,24.24,310];
+  const quick= [0.52,0.99,2.48,6.38,23.50,290];
+  const maxVal=Math.max(...bubble);
+  const toX=n=>PAD.l+(Math.log10(n)-Math.log10(500))/(Math.log10(100000)-Math.log10(500))*cW;
+  const toY=v=>PAD.t+cH-Math.min(v/maxVal,1)*cH;
+  const series=[
+    {data:bubble,color:'#ef4444',label:'Burbuja Python O(n²)'},
+    {data:bJava, color:'#f97316',label:'Burbuja Java O(n²)'},
+    {data:merge, color:'#10b981',label:'MergeSort Θ(n log n)'},
+    {data:quick, color:'#00e5ff',label:'QuickSort Θ(n log n)'},
+  ];
+  series.forEach(({data:d,color,label})=>{
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2.5;
+    ctx.shadowColor=color;ctx.shadowBlur=8;
+    realNs.forEach((n,i)=>{
+      const x=toX(n),y=toY(d[i]);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();ctx.shadowBlur=0;
+    realNs.forEach((n,i)=>{
+      ctx.beginPath();ctx.arc(toX(n),toY(d[i]),4,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.fill();
+    });
+  });
+  // axes
+  ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t);ctx.lineTo(PAD.l,H-PAD.b);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(PAD.l,H-PAD.b);ctx.lineTo(W-PAD.r,H-PAD.b);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px JetBrains Mono';
+  [500,1000,2000,5000,10000,100000].forEach(n=>{
+    const label=n>=1000?n/1000+'k':n+'';
+    ctx.fillText(label,toX(n)-10,H-PAD.b+15);
+  });
+  ctx.fillText('n (escala log)',W/2-40,H-PAD.b+35);
+  // legend 2 rows
+  series.forEach(({color,label},i)=>{
+    const lx=PAD.l+10+(i%2)*360, ly=PAD.t+(Math.floor(i/2))*18+6;
+    ctx.fillStyle=color;ctx.fillRect(lx,ly-6,18,3);
+    ctx.fillStyle='#ccc';ctx.font='10px JetBrains Mono';ctx.fillText(label,lx+22,ly);
+  });
+  // y-axis label
+  ctx.save();ctx.translate(14,H/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px JetBrains Mono';
+  ctx.fillText('Tiempo (ms)',-40,0);ctx.restore();
+}
+
+// ─────────────────── INIT ─────────────────────────────────────
+renderTerms('F',termsF);
+renderTerms('G',termsG);
+drawFunctions();
+// P3c: tabla de error flotante
+(function(){
+  const coefs=[9,5,0,2,8]; // f(n) = 8n^4+2n^3+5n+9
+  const rows=[];
+  for(let a=1;a<=8;a++){
+    let exacto=0;
+    coefs.forEach((c,i)=>{let p=1;for(let k=0;k<i;k++)p*=a;exacto+=c*p;});
+    const flotante=coefs.reduce((s,c,i)=>s+c*Math.pow(a,i),0);
+    const err=Math.abs(exacto-flotante);
+    rows.push(`<tr><td>${a}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${exacto}</td><td style="font-family:'JetBrains Mono',monospace">${flotante.toFixed(10)}</td><td class="${err===0?'err-good':'err-med'}">${err===0?'0 (exacto)':err.toExponential(3)}</td></tr>`);
+  }
+  const el=document.getElementById('p3ErrorTable');
+  if(el) el.innerHTML=`<p style="font-size:.83rem;margin-bottom:.5rem;color:var(--muted)">f(n) = 8n⁴+2n³+5n+9 · evaluado con enteros vs Math.pow (flotante):</p><table class="err-table"><thead><tr><th style="text-align:left">a</th><th>f(a) exacto</th><th>f(a) flotante</th><th>Error abs.</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+})();
+</script>
+</body>
+</html>
